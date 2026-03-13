@@ -1,3 +1,4 @@
+%%writefile personagem.py
 import random
 
 class PersonagemDoJogo:
@@ -7,11 +8,19 @@ class PersonagemDoJogo:
         self.vida = 100
         self.nivel = 1
         self.força = 10
-        
+
+
+        self.inimigo = {
+            "nome": "Goblin",
+            "vida": random.randint(50,150),
+            "nivel": 1,
+            "força": 10
+        }
+
     @property
     def nome(self):
         return self._nome
-    
+
     def receber_dano(self, dano):
         chance_defesa = random.randint(1, 100)
 
@@ -31,59 +40,30 @@ class PersonagemDoJogo:
         if self.vida <= 0:
             print(f"{self.nome} foi derrotado!")
 
-    def atacar(self, alvo):
+    def atacar(self):
+
+        if self.inimigo["força"] > self.força:
+            print(f"{self.nome} percebeu que {self.inimigo['nome']} é muito forte!")
+            print("Você não conseguirá derrotá-lo agora.")
+            print("Tente usar um Elixir de Força!")
+            return
+
         dano = self.força + self.nivel
-        print(f"{self.nome} atacou {alvo.nome} causando {dano} de dano!")
-        alvo.receber_dano(dano)
+        print(f"{self.nome} atacou {self.inimigo['nome']} causando {dano} de dano!")
+
+        self.inimigo["vida"] -= dano
+        print(f"{self.inimigo['nome']} recebeu {dano} de dano!")
+
+        if self.inimigo["vida"] <= 0:
+            print(f"{self.inimigo['nome']} foi derrotado!")
+
+    def inimigo_atacar(self):
+        dano = self.inimigo["força"] + self.inimigo["nivel"]
+        print(f"{self.inimigo['nome']} atacou {self.nome} causando {dano} de dano!")
+        self.receber_dano(dano)
 
     def subir_de_nivel(self):
         self.nivel += 1
         self.força += 5
         self.vida += 25
-        print(f"{self.nome} subiu para o nível {self.nivel}!")
-
-    def usar_item(self, item):
-        if item in self.inventario:
-
-            if item == "Poção da Vida":
-                self.vida += 30
-                print(f"{self.nome} tomou a Poção da Vida e ganhou +30 de vida!")
-
-            elif item == "Elixir de Força":
-                self.força += 15
-                print(f"{self.nome} tomou o Elixir de Força e ganhou +15 de força!")
-
-            self.inventario.remove(item)
-
-        else:
-            print("Item não encontrado no inventário.")
-
-print("\n⚔️ BATALHA COMEÇOU ⚔️\n")
-
-heroi = PersonagemDoJogo("Superman")
-vilao = PersonagemDoJogo("Lex Luthor")
-
-# Adicionando itens
-heroi.inventario.append("Poção da Vida")
-heroi.inventario.append("Elixir de Força")
-
-vilao.inventario.append("Poção da Vida")
-
-# Loop da batalha
-while heroi.vida > 0 and vilao.vida > 0:
-
-    print("\n--- Novo Turno ---\n")
-
-    heroi.atacar(vilao)
-
-    if vilao.vida <= 0:
-        break
-
-    vilao.atacar(heroi)
-
-print("\n🏆 BATALHA TERMINOU 🏆")
-
-if heroi.vida > 0:
-    print(f"🎉 {heroi.nome} venceu a batalha!")
-else:
-    print(f"💀 {vilao.nome} venceu a batalha!")
+        self.inimigo["nivel"]
